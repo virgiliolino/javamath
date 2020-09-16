@@ -33,4 +33,11 @@ public class InputSanitizerTest {
         Assert.assertEquals(10, validShapes.size());
     }
 
+    @Test
+    public void InputSanitizerTest_whenItProcessValidInoutTheOutputShouldNotBeTouched() {
+        List<Shape> list = this.createXEqualShapes(10);
+        List<Shape> validShapes = inputSanitizer.sanitize(list);
+        Assert.assertTrue(list.equals(validShapes));
+    }
+
 }
