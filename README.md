@@ -1,6 +1,6 @@
 # Intersection of Shapes.
 
-In this repository you'll find a small CLI CLI Application in Java that finds the intersections between rectangles.
+In this repository you'll find a small CLI Application in Java that finds the intersections between rectangles.
 The list of rectangles will be read from a list whose path is passed as unique parameter.
 
 For calculating the intersection(or collission) between the Rectangles we're using the java.awt library. 
@@ -29,7 +29,12 @@ At the end of the process you'll the output of the Intersection calculation appl
 
 ```
 ./gradlew clean build
-java -jar ./build/libs/spatial-0.0.1-SNAPSHOT.jar
+```
+
+# Running the CLI application.
+
+```
+java -jar ./build/libs/spatial-0.0.1-SNAPSHOT.jar shapes.json
 ```
 or the equivalent with make:
 ```
