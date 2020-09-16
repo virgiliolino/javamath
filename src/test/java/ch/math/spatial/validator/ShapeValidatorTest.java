@@ -1,5 +1,6 @@
 package ch.math.spatial.validator;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -38,6 +39,13 @@ public class ShapeValidatorTest {
         shapesValidator.validate(list);
     }
 
+    @Test
+    public void shapesValidatorTest_ValidShapesDontThrowException() throws InvalidLengthException {
+        Shape rectangle = new Rectangle(100, 100, 250, 80);
+        java.util.List<Shape> list = Arrays.asList(rectangle);
+        shapesValidator.validate(list);
+        Assert.assertEquals(1, list.size());
+    }
 
 }
 
