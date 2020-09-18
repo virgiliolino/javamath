@@ -1,4 +1,4 @@
-package ch.math.spatial.intersection;
+package ch.math.spatial.shapes;
 
 import org.springframework.stereotype.Service;
 import java.awt.*;

@@ -24,12 +24,12 @@ final public class DeserializerImpl implements Deserializer<List<Shape>> {
     public List<Shape> deserialize(InputStream content) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerSubtypes(
-            new NamedType(java.awt.Rectangle.class, "rect")
+            new NamedType(ch.math.spatial.shapes.Rectangle.class, "rect")
         );
         objectMapper.addHandler(this.typeHandler);
         return objectMapper.readValue(
             content,
-            new TypeReference<List<Rectangle>>() {}
+            new TypeReference<List<ch.math.spatial.shapes.Rectangle>>() {}
         );
     }
 

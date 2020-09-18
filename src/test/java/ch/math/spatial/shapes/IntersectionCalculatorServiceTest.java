@@ -1,4 +1,4 @@
-package ch.math.spatial.intersection;
+package ch.math.spatial.shapes;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +34,6 @@ public class IntersectionCalculatorServiceTest {
     /**
      * Multiple input rectangles with the same coordinates and sizes are nevertheless
      * distinct. All should be included when determining intersections.
-     * Intersections of Shapes with same coordinates should be N*N-1
      */
     @Test
     public void IntersectionCalculatorServiceTest_ItShouldProcessMultipleRectanglesWithSameCoordinates() {

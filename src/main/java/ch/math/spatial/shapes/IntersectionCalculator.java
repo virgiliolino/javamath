@@ -1,4 +1,4 @@
-package ch.math.spatial.intersection;
+package ch.math.spatial.shapes;
 
 import java.awt.*;
 import java.util.List;
