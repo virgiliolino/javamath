@@ -1,12 +1,12 @@
 package ch.math.spatial.shapes;
+import ch.math.spatial.shapes.operation.Intersection;
+import ch.math.spatial.shapes.operation.IntersectionCalculatorService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -24,9 +24,9 @@ public class IntersectionCalculatorServiceTest {
      * Multiple input rectangles with the same coordinates and sizes are nevertheless
      * distinct. All should be included when determining intersections.
      */
-    private List<Shape> createXEqualShapes(Integer x) {
-        List<Shape> list = new ArrayList<>();
-        Shape rectangle = new Rectangle(100, 100, 250, 80);
+    private List<Rectangle> createXEqualShapes(Integer x) {
+        List<Rectangle> list = new ArrayList<>();
+        Rectangle rectangle = new Rectangle(100, 100, 250, 80);
         IntStream.range(0, x).forEach(index -> list.add(rectangle));
         return list;
     }
@@ -38,8 +38,8 @@ public class IntersectionCalculatorServiceTest {
     @Test
     public void IntersectionCalculatorServiceTest_ItShouldProcessMultipleRectanglesWithSameCoordinates() {
         int n = 3;
-        List<Shape> list = this.createXEqualShapes(n);
-        List<Intersection> intersections = intersectionCalculatorService.getIntersections(list);
+        List<Rectangle> list = this.createXEqualShapes(n);
+        List<Intersection<Rectangle>> intersections = intersectionCalculatorService.getIntersections(list);
         int numberOfIntersections = 4;
         Assert.assertEquals(intersections.size(), numberOfIntersections);
     }
@@ -50,17 +50,17 @@ public class IntersectionCalculatorServiceTest {
      */
     @Test
     public void IntersectionCalculatorServiceTest_whenAnIntersectionIsEmpty_thenSkip() {
-        List<Shape> list = new ArrayList<>();
+        List<Rectangle> list = new ArrayList<>();
 
         list.add(new Rectangle(100, 100, 250, 80));
         list.add(new Rectangle(100, 50, 250, 50));
-        List<Intersection> intersections = this.intersectionCalculatorService.getIntersections(list);
+        List<Intersection<Rectangle>> intersections = this.intersectionCalculatorService.getIntersections(list);
         Assert.assertEquals(0, intersections.size());
     }
 
     @Test
     public void IntersectionCalculatorServiceTest_whenEmptyList_thenReturnEmpty() {
-        List<Shape> emptyList = new ArrayList<>();
+        List<Rectangle> emptyList = new ArrayList<>();
         assertEquals(
                 "it should be empty",
                 intersectionCalculatorService.getIntersections(emptyList),
@@ -69,14 +69,14 @@ public class IntersectionCalculatorServiceTest {
 
     @Test
     public void IntersectionCalculatorServiceTest_itShouldBeCommutative() {
-        List<Shape> list = new ArrayList<>();
+        List<Rectangle> list = new ArrayList<>();
 
         list.add(new Rectangle(100, 100, 250, 80));
         list.add(new Rectangle(120, 200, 250, 150));
         list.add(new Rectangle(140, 160, 250, 100));
         list.add(new Rectangle(160, 140, 350, 190));
 
-        List<Intersection> actualReturn = intersectionCalculatorService.getIntersections(list);
+        List<Intersection<Rectangle>> actualReturn = intersectionCalculatorService.getIntersections(list);
         List<Intersection> expectedReturn = Arrays.asList(
             new Intersection(Arrays.asList(1, 3), new Rectangle(140, 160, 210, 20)),
             new Intersection(Arrays.asList(1, 4), new Rectangle(160, 140, 190, 40)),
@@ -106,13 +106,13 @@ public class IntersectionCalculatorServiceTest {
 
     @Test
     public void IntersectionCalculatorServiceTest_itShouldFindEveryIntersection() {
-        List<Shape> list = new ArrayList<>();
+        List<Rectangle> list = new ArrayList<>();
 
         IntStream.range(100, 110).forEach(x ->
                 list.add(new Rectangle(x, 100, 250, 80))
         );
 
-        List<Intersection> actualReturn = intersectionCalculatorService.getIntersections(list);
+        List<Intersection<Rectangle>> actualReturn = intersectionCalculatorService.getIntersections(list);
 
         Assert.assertTrue(actualReturn.get(actualReturn.size() -1).getShapeKeys().size() > 6);
     }

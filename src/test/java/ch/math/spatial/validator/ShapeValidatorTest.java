@@ -1,5 +1,6 @@
 package ch.math.spatial.validator;
 
+import ch.math.spatial.shapes.Rectangle;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -8,8 +9,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.awt.*;
 import java.util.Arrays;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -19,31 +18,37 @@ public class ShapeValidatorTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @InjectMocks
-    private ShapesValidator shapesValidator;
+    private RectangleValidator shapesValidator;
 
     @Test
-    public void shapesValidatorTest_ShapeHeightMustBePositive() throws InvalidLengthException {
-        thrown.expect(InvalidLengthException.class);
+    public void shapesValidatorTest_ShapeHeightMustBePositive() throws InvalidStructureException {
+        thrown.expect(InvalidStructureException.class);
 
-        Shape rectangle = new Rectangle(100, 100, -250, 80);
-        java.util.List<Shape> list = Arrays.asList(rectangle);
-        shapesValidator.validate(list);
+        ch.math.spatial.shapes.Rectangle rectangle = new Rectangle(100, 100, -250, 80);
+        java.util.List<Rectangle> list = Arrays.asList(rectangle);
+        for(Rectangle shape: list) {
+            this.shapesValidator.validate(shape);
+        }
     }
 
     @Test
-    public void shapesValidatorTest_ShapeWidthMustBePositive() throws InvalidLengthException {
-        thrown.expect(InvalidLengthException.class);
+    public void shapesValidatorTest_ShapeWidthMustBePositive() throws InvalidStructureException {
+        thrown.expect(InvalidStructureException.class);
 
-        Shape rectangle = new Rectangle(100, 100, -250, 80);
-        java.util.List<Shape> list = Arrays.asList(rectangle);
-        shapesValidator.validate(list);
+        Rectangle rectangle = new Rectangle(100, 100, -250, 80);
+        java.util.List<Rectangle> list = Arrays.asList(rectangle);
+        for(Rectangle shape: list) {
+            this.shapesValidator.validate(shape);
+        }
     }
 
     @Test
-    public void shapesValidatorTest_ValidShapesDontThrowException() throws InvalidLengthException {
-        Shape rectangle = new Rectangle(100, 100, 250, 80);
-        java.util.List<Shape> list = Arrays.asList(rectangle);
-        shapesValidator.validate(list);
+    public void shapesValidatorTest_ValidShapesDontThrowException() throws InvalidStructureException {
+        Rectangle rectangle = new Rectangle(100, 100, 250, 80);
+        java.util.List<Rectangle> list = Arrays.asList(rectangle);
+        for(Rectangle shape: list) {
+            this.shapesValidator.validate(shape);
+        }
         Assert.assertEquals(1, list.size());
     }
 

@@ -2,7 +2,8 @@ package ch.math.spatial.deserializer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 public interface Deserializer<T> {
-    public T deserialize(InputStream content) throws IOException;
+    List<T> deserialize(InputStream content) throws IOException;
 }

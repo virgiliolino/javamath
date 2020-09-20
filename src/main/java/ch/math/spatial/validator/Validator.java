@@ -5,5 +5,5 @@ package ch.math.spatial.validator;
  * @param <T>
  */
 public interface Validator<T> {
-    public void validate(T elem) throws InvalidLengthException;
+    void validate(T elem) throws InvalidStructureException;
 }

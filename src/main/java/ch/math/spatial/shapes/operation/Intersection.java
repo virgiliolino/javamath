@@ -1,4 +1,4 @@
-package ch.math.spatial.shapes;
+package ch.math.spatial.shapes.operation;
 
 import java.awt.*;
 import java.util.List;
@@ -7,16 +7,16 @@ import java.util.stream.Collectors;
 /**
  * Value Object representing an intersection between to shapes.
  */
-final public class Intersection {
+final public class Intersection<T extends Shape> {
     private final List<Integer> shapeKeys;
-    private final Shape commonArea;
+    private final T commonArea;
 
     /**
      *
      * @param shapeKeys Keys of the Shapes that share a portion of space
      * @param commonArea Area built by the intersaction of the shapes
      */
-    Intersection(List<Integer> shapeKeys, Shape commonArea) {
+    public Intersection(List<Integer> shapeKeys, T commonArea) {
         this.shapeKeys = shapeKeys;
         this.commonArea = commonArea;
     }
@@ -25,7 +25,7 @@ final public class Intersection {
         return this.shapeKeys;
     }
 
-    public Shape getCommonArea() {
+    public T getCommonArea() {
         return this.commonArea;
     }
 
@@ -42,5 +42,4 @@ final public class Intersection {
     private String getIndexes(List<Integer> indexes) {
         return indexes.stream().map(String::valueOf).collect(Collectors.joining(" and "));
     }
-
 }
