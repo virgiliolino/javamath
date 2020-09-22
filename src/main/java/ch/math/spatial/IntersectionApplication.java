@@ -1,75 +1,41 @@
 package ch.math.spatial;
 
-import ch.math.spatial.deserializer.Deserializer;
-import ch.math.spatial.intersection.Intersection;
-import ch.math.spatial.intersection.IntersectionCalculator;
-import ch.math.spatial.sanitizer.Sanitizer;
-import ch.math.spatial.validator.InvalidLengthException;
-import ch.math.spatial.validator.Validator;
-import ch.math.spatial.view.OutputHandler;
-import com.fasterxml.jackson.core.JsonParseException;
+import ch.math.spatial.deserializer.DeserializerImpl;
+import ch.math.spatial.deserializer.handler.DeserializationProblemHandlerImpl;
+import ch.math.spatial.deserializer.handler.field.RectangleFieldHandlerStrategy;
+import ch.math.spatial.sanitizer.RectangleInputSanitizer;
+import ch.math.spatial.shapes.operation.IntersectionCalculatorService;
+import ch.math.spatial.shapes.Rectangle;
+import ch.math.spatial.validator.RectangleValidator;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import picocli.CommandLine;
 
-import java.awt.*;
-import java.io.*;
 import java.util.List;
 
 @SpringBootApplication
 public class IntersectionApplication implements CommandLineRunner {
-    private final Deserializer<List<Shape>> deserializer;
-    private final Sanitizer<List<Shape>> sanitizer;
-    private Validator<List<Shape>> shapesValidator;
-    private final IntersectionCalculator intersectionCalculator;
-    private final OutputHandler outputHandler;
-
     public static void main(String[] args) {
         SpringApplication.run(IntersectionApplication.class, args);
     }
 
-    IntersectionApplication(
-            Deserializer<List<Shape>> deserializer,
-            Sanitizer<List<Shape>> inputSanitizer,
-            Validator<List<Shape>> shapesValidator,
-            IntersectionCalculator intersectionCalculator,
-            OutputHandler outputHandler
-    ) {
-        this.deserializer = deserializer;
-        this.sanitizer = inputSanitizer;
-        this.shapesValidator = shapesValidator;
-        this.intersectionCalculator = intersectionCalculator;
-        this.outputHandler = outputHandler;
-    }
-
     @Override
-    public void run(String[] args) throws IOException {
-        if (args.length != 1) {
-            outputHandler.error("Usage: command <filename.json>");
-        }
-
-        String fileName = args[0];
-        try {
-            InputStream input = new FileInputStream(fileName);
-            List<Shape> shapes = this.deserializer.deserialize(input);
-            this.shapesValidator.validate(shapes);
-
-            List<Shape> validShapes = this.sanitizer.sanitize(shapes);
-
-            this.outputHandler.displayInput(validShapes);
-            List<Intersection> intersections = this.intersectionCalculator.getIntersections(validShapes);
-            this.outputHandler.displayOutput(intersections);
-
-        } catch (java.io.FileNotFoundException fileNotFoundException) {
-            outputHandler.error(
-                "Indicated filename was not found." +
-                "Please ensure its correctly written and in the specified path"
-            );
-        } catch (JsonParseException jsonParseException) {
-            this.outputHandler.error("The provided file is not correct");
-        } catch (InvalidLengthException e) {
-            this.outputHandler.error(e.getMessage());
-        }
+    public void run(String[] args){
+        IntersectionCommand<Rectangle> intersectionCommand = new IntersectionCommand<>(
+                new DeserializerImpl<>(
+                        new DeserializationProblemHandlerImpl(
+                                new RectangleFieldHandlerStrategy[]{ new RectangleFieldHandlerStrategy() }
+                        ),
+                        new TypeReference<List<Rectangle>>() {},
+                        new NamedType(Rectangle.class, "rect")
+                ),
+                new RectangleInputSanitizer(),
+                new RectangleValidator(),
+                new IntersectionCalculatorService()
+        );
+        System.exit(new CommandLine(intersectionCommand).execute(args));
     }
-
 }

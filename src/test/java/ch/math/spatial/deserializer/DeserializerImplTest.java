@@ -1,7 +1,9 @@
 package ch.math.spatial.deserializer;
 import ch.math.spatial.deserializer.handler.DeserializationProblemHandlerImpl;
 import ch.math.spatial.deserializer.handler.field.RectangleFieldHandlerStrategy;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,10 +28,13 @@ public class DeserializerImplTest {
 
     @Before
     public void setUp(){
-        DeserializationProblemHandler typeHandler = new DeserializationProblemHandlerImpl(
-                new RectangleFieldHandlerStrategy[]{ new RectangleFieldHandlerStrategy() }
+        this.deserializerImpl = new DeserializerImpl<>(
+                new DeserializationProblemHandlerImpl(
+                        new RectangleFieldHandlerStrategy[]{ new RectangleFieldHandlerStrategy() }
+                ),
+                new TypeReference<List<ch.math.spatial.shapes.Rectangle>>() {},
+                new NamedType(ch.math.spatial.shapes.Rectangle.class, "rect")
         );
-        this.deserializerImpl = new DeserializerImpl(typeHandler);
     }
 
     @Test
@@ -53,7 +58,7 @@ public class DeserializerImplTest {
 
         byte[] data = inputString.getBytes();
         InputStream input = new ByteArrayInputStream(data);
-        List<Shape> output = deserializerImpl.deserialize(input);
+        List<Rectangle> output = deserializerImpl.deserialize(input);
         Assert.assertEquals(2, output.size());
         Assert.assertEquals(output.get(0), new Rectangle(100, 100, 250, 80));
         Assert.assertEquals(output.get(1), new Rectangle(120, 200, 250, 150));
@@ -75,7 +80,7 @@ public class DeserializerImplTest {
 
         byte[] data = inputString.getBytes();
         InputStream input = new ByteArrayInputStream(data);
-        List<Shape> output = deserializerImpl.deserialize(input);
+        List<Rectangle> output = deserializerImpl.deserialize(input);
         Assert.assertEquals(2, output.size());
     }
 
