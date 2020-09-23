@@ -21,3 +21,5 @@ gradle-build:
 	./gradlew clean build
 test:
 	gradle test
+tdd:
+	watch ./gradlew clean test --tests $(test)
