@@ -52,8 +52,6 @@ class IntersectionCommand<T extends Shape> implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         try {
-            //InputStream input = new FileInputStream(this.filename);
-            //InputStream input = InputStreamFactory
             InputStream input = inputStreamFactory.fromFile(filename);
             List<T> shapes = this.deserializer.deserialize(input);
             List<T> validShapes = this.sanitizer.sanitize(shapes);
