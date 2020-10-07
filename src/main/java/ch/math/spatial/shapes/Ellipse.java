@@ -1,18 +1,20 @@
 package ch.math.spatial.shapes;
 
-public class Rectangle extends java.awt.Rectangle
+import java.awt.geom.Ellipse2D;
+
+public class Ellipse extends Ellipse2D.Double
 implements SpatialShape {
-    public Rectangle() {
+    public Ellipse() {
         super();
     }
 
-    public Rectangle(int x, int y, int width, int height) {
+    public Ellipse(int x, int y, int width, int height) {
         super(x, y, width, height);
     }
 
     @Override
     public String toString() {
-        return " Rectangle at " + displayShape();
+        return " Ellipse at " + displayShape();
     }
 
     private String displayShape() {

@@ -1,12 +1,15 @@
 package ch.math.spatial;
 
 import ch.math.spatial.deserializer.DeserializerImpl;
+import ch.math.spatial.deserializer.InputStreamFactory;
 import ch.math.spatial.deserializer.handler.DeserializationProblemHandlerImpl;
 import ch.math.spatial.deserializer.handler.field.RectangleFieldHandlerStrategy;
-import ch.math.spatial.sanitizer.RectangleInputSanitizer;
+import ch.math.spatial.sanitizer.SpatialShapeInputSanitizer;
+import ch.math.spatial.shapes.Ellipse;
+import ch.math.spatial.shapes.SpatialShape;
 import ch.math.spatial.shapes.operation.IntersectionCalculatorService;
 import ch.math.spatial.shapes.Rectangle;
-import ch.math.spatial.validator.RectangleValidator;
+import ch.math.spatial.validator.ShapeValidator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import org.springframework.boot.CommandLineRunner;
@@ -14,6 +17,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import picocli.CommandLine;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 
 @SpringBootApplication
@@ -24,18 +29,27 @@ public class IntersectionApplication implements CommandLineRunner {
 
     @Override
     public void run(String[] args){
-        IntersectionCommand<Rectangle> intersectionCommand = new IntersectionCommand<>(
+        IntersectionCommand<SpatialShape> intersectionCommand = new IntersectionCommand<>(
+                new InputStreamFactory(),
                 new DeserializerImpl<>(
                         new DeserializationProblemHandlerImpl(
                                 new RectangleFieldHandlerStrategy[]{ new RectangleFieldHandlerStrategy() }
                         ),
-                        new TypeReference<List<Rectangle>>() {},
-                        new NamedType(Rectangle.class, "rect")
+                        new TypeReference<List<SpatialShape>>() {},
+                        new NamedType[] {
+                                new NamedType(Rectangle.class, "rectangle"),
+                                new NamedType(Ellipse.class, "ellipse")
+                        }
                 ),
-                new RectangleInputSanitizer(),
-                new RectangleValidator(),
+                new SpatialShapeInputSanitizer(),
+                new ShapeValidator(),
                 new IntersectionCalculatorService()
         );
-        System.exit(new CommandLine(intersectionCommand).execute(args));
+        StringWriter commandOutput = new StringWriter();
+        CommandLine command = new CommandLine(intersectionCommand);
+        command.setOut(new PrintWriter(commandOutput));
+        int exitCode = command.execute(args);
+        System.out.println(commandOutput.toString());
+        System.exit(exitCode);
     }
 }

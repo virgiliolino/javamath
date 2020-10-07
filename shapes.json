@@ -1,6 +1,6 @@
 [
     {
-      "type": "rectangle",
+      "type": "ellipse",
       "x": 100,
       "y": 100,
       "width": 250,
