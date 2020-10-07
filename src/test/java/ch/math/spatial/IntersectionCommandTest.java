@@ -8,7 +8,6 @@ import ch.math.spatial.sanitizer.SpatialShapeInputSanitizer;
 import ch.math.spatial.shapes.Ellipse;
 import ch.math.spatial.shapes.SpatialShape;
 import ch.math.spatial.shapes.operation.IntersectionCalculatorService;
-import ch.math.spatial.shapes.operation.QuadTreeIntersectionCalculatorService;
 import ch.math.spatial.validator.ShapeValidator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
@@ -71,8 +70,7 @@ public class IntersectionCommandTest {
                 ),
                 new SpatialShapeInputSanitizer(),
                 new ShapeValidator(),
-                new QuadTreeIntersectionCalculatorService()
-                //new IntersectionCalculatorService()
+                new IntersectionCalculatorService()
         );
 
         itsOutput = new StringWriter();
