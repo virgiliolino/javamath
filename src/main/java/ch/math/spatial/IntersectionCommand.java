@@ -1,11 +1,13 @@
 package ch.math.spatial;
 
 import ch.math.spatial.deserializer.Deserializer;
+import ch.math.spatial.deserializer.InputStreamFactory;
 import ch.math.spatial.prettier.ListPrettierOperation;
 import ch.math.spatial.sanitizer.Sanitizer;
 import ch.math.spatial.shapes.operation.IntersectionCalculator;
 import ch.math.spatial.validator.Validator;
 import com.fasterxml.jackson.core.JsonParseException;
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
@@ -20,9 +22,13 @@ import ch.math.spatial.shapes.operation.Intersection;
 @Command(name = "intersections", mixinStandardHelpOptions = true, version = "version 0.1",
         description = "Finds and displays to CLI the intersections between Rectangles.")
 class IntersectionCommand<T extends Shape> implements Callable<Integer> {
+    @CommandLine.Spec
+    CommandLine.Model.CommandSpec spec;
+    
     @Parameters(index = "0", description = "The json")
-    private File filename;
+    private String filename;
 
+    private InputStreamFactory inputStreamFactory;
     private final Deserializer<T> deserializer;
     private final Sanitizer<T> sanitizer;
     private final Validator<T> shapesValidator;
@@ -30,11 +36,13 @@ class IntersectionCommand<T extends Shape> implements Callable<Integer> {
     private static final String OUTPUT_FORMAT = "    %d: %s";
 
     IntersectionCommand(
+            InputStreamFactory inputStreamFactory,
             Deserializer<T> deserializer,
             Sanitizer<T> inputSanitizer,
             Validator<T> inputValidator,
             IntersectionCalculator<T> intersectionCalculator
     ) {
+        this.inputStreamFactory = inputStreamFactory;
         this.deserializer = deserializer;
         this.sanitizer = inputSanitizer;
         this.shapesValidator = inputValidator;
@@ -44,34 +52,34 @@ class IntersectionCommand<T extends Shape> implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         try {
-            InputStream input = new FileInputStream(this.filename);
+            InputStream input = inputStreamFactory.fromFile(filename);
             List<T> shapes = this.deserializer.deserialize(input);
             List<T> validShapes = this.sanitizer.sanitize(shapes);
             for(T shape: validShapes) {
                 this.shapesValidator.validate(shape);
             }
 
-            System.out.println("Input:");
+            spec.commandLine().getOut().println("Input:");
             ListPrettierOperation<T> inputPrettier = new ListPrettierOperation<>(
                 OUTPUT_FORMAT, validShapes
             );
-            inputPrettier.call().forEach(System.out::println);
+            inputPrettier.call().forEach(spec.commandLine().getOut()::println);
 
-            System.out.println("\nIntersections:");
+            spec.commandLine().getOut().println("\nIntersections:");
             List<Intersection<T>> intersections = this.intersectionCalculator.getIntersections(validShapes);
             ListPrettierOperation<Intersection<T>> outputPrettier = new ListPrettierOperation<>(
                 OUTPUT_FORMAT, intersections
             );
-            outputPrettier.call().forEach(System.out::println);
+            outputPrettier.call().forEach( spec.commandLine().getOut()::println);
             return 0;
 
         } catch (java.io.FileNotFoundException fileNotFoundException) {
-            System.out.println(
+             spec.commandLine().getOut().println(
                     "Indicated filename was not found." +
                             "Please ensure its correctly written and in the specified path"
             );
         } catch (JsonParseException jsonParseException) {
-            System.out.println("The provided file is not correct");
+             spec.commandLine().getOut().println("The provided file is not correct");
         }
 
         return 1;

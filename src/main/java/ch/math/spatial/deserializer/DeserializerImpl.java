@@ -13,22 +13,22 @@ final public class DeserializerImpl<T> implements Deserializer<T> {
 
     private final DeserializationProblemHandler typeHandler;
     private final TypeReference<List<T>> typeReference;
-    private NamedType namedType;
+    private NamedType[] namedTypes;
 
     public DeserializerImpl(
             DeserializationProblemHandler typeHandler,
             TypeReference<List<T>> typeReference,
-            NamedType namedType
+            NamedType[] namedTypes
     ) {
         this.typeHandler = typeHandler;
         this.typeReference = typeReference;
-        this.namedType = namedType;
+        this.namedTypes = namedTypes;
     }
 
     //todo: implement Either :) to contain side effects inside this method
     public List<T> deserialize(InputStream content) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerSubtypes(namedType);
+        objectMapper.registerSubtypes(namedTypes);
         objectMapper.addHandler(this.typeHandler);
 
         return objectMapper.readValue(content, typeReference);

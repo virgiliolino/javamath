@@ -1,18 +1,20 @@
 package ch.math.spatial.shapes.operation;
 
+import ch.math.spatial.shapes.Rectangle;
+import ch.math.spatial.shapes.SpatialShape;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.List;
 
 @Service
-public class IntersectionCalculatorService implements IntersectionCalculator<ch.math.spatial.shapes.Rectangle> {
+public class IntersectionCalculatorService implements IntersectionCalculator<SpatialShape> {
 
     @Override
-    public List<Intersection<ch.math.spatial.shapes.Rectangle>> getIntersections(List<ch.math.spatial.shapes.Rectangle> shapes) {
-        List<Intersection<ch.math.spatial.shapes.Rectangle>> intersections = new ArrayList<>();
+    public List<Intersection<ch.math.spatial.shapes.SpatialShape>> getIntersections(List<ch.math.spatial.shapes.SpatialShape> shapes) {
+        List<Intersection<ch.math.spatial.shapes.SpatialShape>> intersections = new ArrayList<>();
         int index = 0;
-        for (ch.math.spatial.shapes.Rectangle shape : shapes) {
+        for (ch.math.spatial.shapes.SpatialShape shape : shapes) {
             index++;
             intersections = this.appendNestedIntersections(
                 shapes, intersections,
@@ -24,13 +26,13 @@ public class IntersectionCalculatorService implements IntersectionCalculator<ch.
         return intersections;
     }
 
-   private List<Intersection<ch.math.spatial.shapes.Rectangle>> appendNestedIntersections(
-        List<ch.math.spatial.shapes.Rectangle> shapes,
-        List<Intersection<ch.math.spatial.shapes.Rectangle>> intersections,
-        Intersection<ch.math.spatial.shapes.Rectangle> lastIntersection
+   private List<Intersection<ch.math.spatial.shapes.SpatialShape>> appendNestedIntersections(
+        List<ch.math.spatial.shapes.SpatialShape> shapes,
+        List<Intersection<ch.math.spatial.shapes.SpatialShape>> intersections,
+        Intersection<ch.math.spatial.shapes.SpatialShape> lastIntersection
    ) {
        int index = 1;
-       for (ch.math.spatial.shapes.Rectangle shape : shapes) {
+       for (ch.math.spatial.shapes.SpatialShape shape : shapes) {
            boolean alreadyEvaluated = lastIntersection.getShapeKeys().contains(index);
            if (alreadyEvaluated) {
                continue;
@@ -39,9 +41,9 @@ public class IntersectionCalculatorService implements IntersectionCalculator<ch.
                List<Integer> newKeys = new ArrayList<>(lastIntersection.getShapeKeys());
                newKeys.add(index);
                java.awt.Rectangle bounds = shape.getBounds().intersection(lastIntersection.getCommonArea().getBounds());
-               Intersection<ch.math.spatial.shapes.Rectangle> newIntersection = new Intersection<>(
+               Intersection<ch.math.spatial.shapes.SpatialShape> newIntersection = new Intersection<>(
                        newKeys,
-                       new ch.math.spatial.shapes.Rectangle(bounds.x, bounds.y, bounds.width, bounds.height)
+                       new Rectangle(bounds.x, bounds.y, bounds.width, bounds.height)
                );
                intersections.add(newIntersection);
                intersections = this.appendNestedIntersections(shapes, intersections, newIntersection);

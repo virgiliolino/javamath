@@ -1,6 +1,7 @@
 package ch.math.spatial.deserializer;
 import ch.math.spatial.deserializer.handler.DeserializationProblemHandlerImpl;
 import ch.math.spatial.deserializer.handler.field.RectangleFieldHandlerStrategy;
+import ch.math.spatial.shapes.Ellipse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
@@ -32,8 +33,11 @@ public class DeserializerImplTest {
                 new DeserializationProblemHandlerImpl(
                         new RectangleFieldHandlerStrategy[]{ new RectangleFieldHandlerStrategy() }
                 ),
-                new TypeReference<List<ch.math.spatial.shapes.Rectangle>>() {},
-                new NamedType(ch.math.spatial.shapes.Rectangle.class, "rect")
+                new TypeReference<List<ch.math.spatial.shapes.SpatialShape>>() {},
+                new NamedType[] {
+                        new NamedType(ch.math.spatial.shapes.Rectangle.class, "rectangle"),
+                        new NamedType(Ellipse.class, "ellipse")
+                }
         );
     }
 
@@ -65,9 +69,37 @@ public class DeserializerImplTest {
     }
 
     @Test
+    public void deserializerImplTest_itShouldRecognizeEveryValidShape() throws IOException {
+        String inputString = "[\n" +
+                "    {\n" +
+                "      \"type\": \"ellipse\",\n" +
+                "      \"x\": 100,\n" +
+                "      \"y\": 100,\n" +
+                "      \"width\": 250,\n" +
+                "      \"height\": 80\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"type\": \"rectangle\",\n" +
+                "      \"x\": 120,\n" +
+                "      \"y\": 200,\n" +
+                "      \"width\": 250,\n" +
+                "      \"height\": 150\n" +
+                "    }\n" +
+                "]";
+
+        byte[] data = inputString.getBytes();
+        InputStream input = new ByteArrayInputStream(data);
+        List<Rectangle> output = deserializerImpl.deserialize(input);
+        Assert.assertEquals(2, output.size());
+        Assert.assertEquals(new Ellipse(100, 100, 250, 80), output.get(0));
+        Assert.assertEquals(new Rectangle(120, 200, 250, 150), output.get(1));
+    }
+
+    @Test
     public void deserializerImplTest_whenLoadingEmptyStructureWeShouldDefaultToAShape() throws IOException {
         String inputString = "[\n" +
             "    {\n" +
+            "      \"type\": \"rectangle\"\n" +
             "    },\n" +
             "    {\n" +
             "      \"type\": \"rectangle\",\n" +
@@ -86,7 +118,7 @@ public class DeserializerImplTest {
 
     @Test
     public void deserializerImplTest_whenEvaluatingUnrecognizedShapesWeShouldStopDeserialization() throws IOException {
-        thrown.expect(com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException.class);
+        thrown.expect(com.fasterxml.jackson.databind.exc.InvalidTypeIdException.class);
         String inputString = "[\n" +
                 "    {\n" +
                 "      \"type\": \"Circle\",\n" +

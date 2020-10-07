@@ -18,7 +18,7 @@ public class ShapeValidatorTest {
     public ExpectedException thrown = ExpectedException.none();
 
     @InjectMocks
-    private RectangleValidator shapesValidator;
+    private ShapeValidator shapesValidator;
 
     @Test
     public void shapesValidatorTest_ShapeHeightMustBePositive() throws InvalidStructureException {
